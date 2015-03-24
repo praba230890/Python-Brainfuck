@@ -17,29 +17,30 @@ def evaluate(code):
   code     = cleanup(list(code))
   bracemap = buildbracemap(code)
 
-  cells, codeptr, cellptr = [0], 0, 0
+  cells, codeptr, cur_ptr = [0], 0, 0
 
   while codeptr < len(code):
     command = code[codeptr]
 
     if command == ">":
-      cellptr += 1
-      if cellptr == len(cells): cells.append(0)
+      cur_ptr += 1
+      if cur_ptr == len(cells): cells.append(0)
 
     if command == "<":
-      cellptr = 0 if cellptr <= 0 else cellptr - 1
+      cur_ptr = 0 if cur_ptr <= 0 else cur_ptr - 1
 
     if command == "+":
-      cells[cellptr] = cells[cellptr] + 1 if cells[cellptr] < 255 else 0
+      cells[cur_ptr] = cells[cur_ptr] + 1 if cells[cur_ptr] < 255 else 0
 
     if command == "-":
-      cells[cellptr] = cells[cellptr] - 1 if cells[cellptr] > 0 else 255
+      cells[cur_ptr] = cells[cur_ptr] - 1 if cells[cur_ptr] > 0 else 255
 
-    if command == "[" and cells[cellptr] == 0: codeptr = bracemap[codeptr]
-    if command == "]" and cells[cellptr] != 0: codeptr = bracemap[codeptr]
-    if command == ".": sys.stdout.write(chr(cells[cellptr]))
-    if command == ",": cells[cellptr] = ord(getch.getch())
-      
+    if command == "[" and cells[cur_ptr] == 0: codeptr = bracemap[codeptr]
+    if command == "]" and cells[cur_ptr] != 0: codeptr = bracemap[codeptr]
+    if command == ".":
+        sys.stdout.write(chr(cells[cur_ptr]))
+    if command == ",": cells[cur_ptr] = ord(getch.getch())
+
     codeptr += 1
 
 
@@ -63,5 +64,10 @@ def main():
   if len(sys.argv) == 2: execute(sys.argv[1])
   else: print "Usage:", sys.argv[0], "filename"
 
-if __name__ == "__main__": main()
-
+if __name__ == "__main__":
+    try:
+        main()
+    except (KeyboardInterrupt, SystemExit):
+        print "\n Recieved Interrupt Signal. Bye...."
+        import sys
+        sys.exit()
